@@ -1,4 +1,5 @@
 import pandas as pd
+import unittest
 
 def createTestDataFrame():
     dataRows = []
@@ -10,6 +11,11 @@ def createTestDataFrame():
     return df
 
 def splitDataFrame(dataFrame, size):
+    if (dataFrame == None):
+        raise RuntimeError("data frame is required")
+    if (size == None):
+        raise RuntimeError("size is required")
+
     response = { 'success': True, 'data':[], 'message': 'ok' }
 
     data = []
@@ -21,18 +27,30 @@ def splitDataFrame(dataFrame, size):
             rowCount = dataFrame.shape[0]
             if (rowCount > 0):
                 topRow = dataFrame.iloc[:1]
-                dataFrame.drop(index=df.index[0], axis=0, inplace=True)
+                dataFrame.drop(index=dataFrame.index[0], axis=0, inplace=True)
                 subGroup = pd.concat([topRow, subGroup],ignore_index = True)
                 subGroup.reset_index()
-                
-        data.append(subGroup)
+        if (subGroup.shape[0] > 0):
+            data.append(subGroup)
     
     response['data'] = data
     return response
 
-df = createTestDataFrame()
+class TestSplitter(unittest.TestCase):
+    def test_splitDataFrame_handleValidInputs(self):
+        # arrange
+        test_data = createTestDataFrame()
+        
+        # act
+        response = splitDataFrame(test_data, 10)
+        
+        # assert
+        output = response['data']
+        print(len(output))
+        self.assertTrue(response)
+        self.assertTrue(len(output)==3)
 
-response = splitDataFrame(df, 10)
 
-frames = response['data']
-print(frames[2])
+if __name__ == '__main__':
+    unittest.main()
+
