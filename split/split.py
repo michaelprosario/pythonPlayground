@@ -11,11 +11,6 @@ def createTestDataFrame():
     return df
 
 def splitDataFrame(dataFrame, size):
-    if (dataFrame == None):
-        raise RuntimeError("data frame is required")
-    if (size == None):
-        raise RuntimeError("size is required")
-
     response = { 'success': True, 'data':[], 'message': 'ok' }
 
     data = []
