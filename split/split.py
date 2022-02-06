@@ -1,50 +1,57 @@
 import pandas as pd
 import unittest
+import banana
 
-def createTestDataFrame():
+def createTestDataFrame(size):
     dataRows = []
-    for i in range(30):
+    for i in range(size):
         row = {'name': 'foo ' + str(i), 'value': i}
         dataRows.append(row)
 
     df = pd.DataFrame(dataRows)
     return df
 
-def splitDataFrame(dataFrame, size):
-    response = { 'success': True, 'data':[], 'message': 'ok' }
-
-    data = []
-    # while source data frame has stuff
-    rowCount = dataFrame.shape[0]
-    while rowCount > 0:
-        subGroup = pd.DataFrame()
-        for i in range(size):
-            rowCount = dataFrame.shape[0]
-            if (rowCount > 0):
-                topRow = dataFrame.iloc[:1]
-                dataFrame.drop(index=dataFrame.index[0], axis=0, inplace=True)
-                subGroup = pd.concat([topRow, subGroup],ignore_index = True)
-                subGroup.reset_index()
-        if (subGroup.shape[0] > 0):
-            data.append(subGroup)
-    
-    response['data'] = data
-    return response
-
 class TestSplitter(unittest.TestCase):
-    def test_splitDataFrame_handleValidInputs(self):
+    def test_bananaSplit_handleValidInputs(self):
         # arrange
-        test_data = createTestDataFrame()
+        test_data = createTestDataFrame(30)
         
         # act
-        response = splitDataFrame(test_data, 10)
+        response = banana.split(test_data, 10)
+        
+        # assert
+        output = response['data']        
+        self.assertTrue(response)
+        self.assertTrue(len(output)==3)
+
+    def test_bananaSplit_handleLargeDataFrame(self):
+        # arrange
+        test_data = createTestDataFrame(300)
+        
+        # act
+        response = banana.split(test_data, 10)
+        
+        # assert
+        output = response['data']        
+        self.assertTrue(response)
+        self.assertTrue(len(output)==30)
+        print(output[9])
+
+    def test_bananaSplit_handleCaseWhereSizeBiggerThanDataFrame(self):
+        # arrange
+        test_data = createTestDataFrame(30)
+        
+        # act
+        response = banana.split(test_data, 50)
         
         # assert
         output = response['data']
         print(len(output))
         self.assertTrue(response)
-        self.assertTrue(len(output)==3)
+        self.assertTrue(len(output)==1)
+        
 
+# what if size is bigger than the data frame?
 
 if __name__ == '__main__':
     unittest.main()
